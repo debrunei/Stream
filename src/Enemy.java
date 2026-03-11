@@ -1,4 +1,6 @@
-package PACKAGE_NAME;
-
-public record Enemy() {
+public record Enemy(
+        String name,
+        int hp,
+        boolean alive,
+        String type) {
 }

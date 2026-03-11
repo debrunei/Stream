@@ -1,4 +1,7 @@
-package PACKAGE_NAME;
+public record Platform(
+        String id,
+        float x,
+        float y,
+        float width) {
 
-public record Platform() {
 }

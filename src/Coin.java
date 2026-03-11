@@ -1,4 +1,6 @@
-package PACKAGE_NAME;
-
-public record Coin() {
+public record Coin(
+        int x,
+        int y,
+        boolean collected,
+        int value) {
 }
