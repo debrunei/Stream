@@ -43,7 +43,7 @@ static List<Enemy> getAliveFlyers(){
 }
 
 static List<Coin> getUncollectedGoldCoins(){
-    return coins.stream().filter(c -> !c.collected()).filter(c -> c.value() == 50).toList();
+    return coins.stream().filter(c -> !c.collected()).filter(c -> c.value() >= 50).toList();
 }
 
 static List<String> getAllEnemyNames(){
@@ -65,6 +65,7 @@ static boolean hasCeilingEnemy(){
     return enemies.stream().anyMatch(e -> e.type().equals("ceiling"));
 }
 
+
 // ─────────────────────────────────────────────
 //  PART 4 — Chained Pipelines (3 pts)
 // ─────────────────────────────────────────────
@@ -73,8 +74,8 @@ static boolean hasCeilingEnemy(){
  * 4a. Return the top 3 unique high scores in DESCENDING order.
  * Hint: distinct() → sorted() with reverse comparator → limit() → collect()
  */
-static List<Enemy> topThreeScores() {
-    return enemies.stream().distinct().sorted().limit(3).collect(Collectors.toList());
+static List<Integer> topThreeScores() {
+    return highScores.stream().distinct().sorted((s1, s2) -> -s1.compareTo(s2)).limit(3).toList();
 }
 
 /**
@@ -83,7 +84,11 @@ static List<Enemy> topThreeScores() {
  *     Hint: filter → map to name → sorted → collect(Collectors.joining(", "))
  */
 static String aliveEnemyNamesCsv() {
-    return enemies.stream().filter(Enemy::alive).map(Enemy::name).sorted().collect(Collectors.joining(", "));
+    return enemies.stream()
+            .filter(Enemy::alive)
+            .sorted((e1, e2) -> e1.name().compareTo(e2.name()))
+            .map(Enemy::name)
+            .collect(Collectors.joining(", "));
 }
 
 /**
@@ -91,7 +96,11 @@ static String aliveEnemyNamesCsv() {
  *     sorted by x-position (ascending).
  */
 static List<String> widePlatformIds() {
-    return platforms.stream().filter(e -> e.width() >= 100f).sorted().map(Platform::id).toList();
+    return platforms.stream()
+            .filter(p -> p.width() >= 100f)
+            .sorted((p1, p2) -> Float.compare(p1.x(), p2.x()))
+            .map(Platform::id)
+            .toList();
 }
 
 // ─────────────────────────────────────────────
@@ -104,7 +113,10 @@ static List<String> widePlatformIds() {
  *     mapToInt(Coin::value).sum() is the cleanest approach.
  */
 static int totalUncollectedCoinValue() {
-    return coins.stream().mapToInt(Coin::value).sum();
+    return coins.stream()
+            .filter(c -> !c.collected())
+            .mapToInt(Coin::value)
+            .sum();
 }
 
 /**
@@ -121,8 +133,13 @@ static boolean allAliveEnemiesHealthy() {
  * Step 1: Calculate average HP using mapToInt().average().orElse(0)
  * Step 2: Filter enemies where hp > average, map to name, collect.
  */
-static double aboveAverageHpNames() {
-    return enemies.stream().mapToInt(Enemy::hp).average().orElse(0);
+static List<String> aboveAverageHpNames() {
+    double averageHp = enemies.stream().mapToInt(Enemy::hp).average().orElse(0);
+
+    return enemies.stream()
+            .filter(e -> e.hp() >= averageHp)
+            .map(Enemy::name)
+            .toList();
 }
 
 // ─────────────────────────────────────────────
